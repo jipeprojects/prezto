@@ -76,6 +76,10 @@ prompt_context() {
   fi
 }
 
+prompt_time() {
+  prompt_segment $PRIMARY_FG default '%D{%H:%M:%S}'
+}
+
 # Git: branch/detached head, dirty status
 prompt_git() {
   local color ref
@@ -103,7 +107,7 @@ prompt_git() {
 
 # Dir: current working directory
 prompt_dir() {
-  prompt_segment blue $PRIMARY_FG ' %1~ '
+  prompt_segment blue white ' %1~ '
 }
 
 # Status:
@@ -126,6 +130,7 @@ prompt_agnoster_main() {
   CURRENT_BG='NONE'
   prompt_status
   #prompt_context
+  prompt_time
   prompt_dir
   prompt_git
   prompt_end
