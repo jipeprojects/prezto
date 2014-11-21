@@ -49,5 +49,8 @@ function fasd_cd {
 # Aliases
 #
 
+# Changes the current working directory by "frecency".
+alias j='fasd_cd'
+
 # Changes the current working directory interactively.
-alias j='fasd_cd -i'
+alias ji='fasd_cd -i'
