@@ -34,6 +34,18 @@ unsetopt HUP              # Don't kill jobs on shell exit.
 unsetopt CHECK_JOBS       # Don't report on jobs when shell exit.
 
 #
+# Grep
+#
+
+if zstyle -t ':prezto:environment:grep' color; then
+  export GREP_COLOR='37;45'
+  function grep()
+  {
+    command grep --color=auto $argv
+  }
+fi
+
+#
 # Termcap
 #
 
