@@ -32,7 +32,7 @@ zstyle ':prezto:load' pmodule \
   'spectrum' \
   'utility' \
   'completion' \
-  'fasd' \
+  'autojump' \
   'history-substring-search' \
   'syntax-highlighting' \
   'prompt'
