@@ -34,6 +34,7 @@ zstyle ':prezto:load' pmodule \
   'completion' \
   'fasd' \
   'history-substring-search' \
+  'gpg' \
   'prompt'
 
 #
