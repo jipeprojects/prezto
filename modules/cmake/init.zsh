@@ -18,9 +18,13 @@ zstyle -s ':prezto:module:cmake' build-prefix '_cmake_build_prefix' \
 zstyle -a ':prezto:module:cmake' profiles '_cmake_profiles' \
   || _cmake_profiles=(Debug Release)
 
+# Whether to look for clang as well.
+zstyle -b ':prezto:module:cmake' support-clang '_cmake_support_clang' \
+  || _cmake_support_clang=true
+
 # Check for clang
 _cmake_has_clang=false
-if (( $+commands[clang] )); then
+if (( ${_cmake_support_clang} && $+commands[clang] )); then
   _cmake_has_clang=true
 fi
 

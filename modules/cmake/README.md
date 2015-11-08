@@ -23,6 +23,9 @@ zstyle ':prezto:module:cmake' build-prefix '_build'
 
 # Set the build profiles.
 zstyle ':prezto:module:cmake' profiles 'Debug' 'Release'
+
+# Whether to support clang as well.
+zstyle ':prezto:module:cmake' support-clang 'yes'
 ```
 
 ### Aliases
