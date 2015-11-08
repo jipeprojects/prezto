@@ -67,3 +67,8 @@ function makeBuildDirectory
 }
 
 alias mb=makeBuildDirectory
+
+# Enable CMake completion
+(( $+functions[compdef] )) && {
+  compdef _cmake makeBuildDirectory
+}
