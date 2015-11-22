@@ -80,9 +80,35 @@ prompt_time() {
   prompt_segment $PRIMARY_FG default '%D{%H:%M:%S}'
 }
 
-# Git: branch/detached head, dirty status
-prompt_git() {
+function prompt_git_async {
   local color ref
+
+  if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1 ; then
+    return
+  fi
+
+  # Append Git status.
+  if [[ -s "$_prompt_agnoster_precmd_async_data" ]]; then
+      data=("${(@f)$(cat $_prompt_agnoster_precmd_async_data)}")
+      color=${data[1]}
+      ref=${data[2]}
+      prompt_segment $color $PRIMARY_FG
+      print -Pn " $ref"
+
+      # Redisplay prompt.
+      zle && zle reset-prompt
+
+    if (( _prompt_agnoster_precmd_async_pid > 0 )); then
+      # Reset PID.
+      _prompt_agnoster_precmd_async_pid=0
+    fi
+  fi
+}
+
+function prompt_agnoster_precmd_async {
+  # Git
+  local color ref
+  vcs_info
   is_dirty() {
     test -n "$(git status --porcelain --ignore-submodules)"
   }
@@ -100,9 +126,11 @@ prompt_git() {
     else
       ref="$DETACHED ${ref/.../}"
     fi
-    prompt_segment $color $PRIMARY_FG
-    print -Pn " $ref"
+    echo "$color\n$ref" >! "$_prompt_agnoster_precmd_async_data"
   fi
+
+  # Signal completion to parent process.
+  kill -WINCH $$
 }
 
 # Dir: current working directory
@@ -132,16 +160,35 @@ prompt_agnoster_main() {
   #prompt_context
   prompt_time
   prompt_dir
-  prompt_git
+  prompt_git_async
   prompt_end
 }
 
 prompt_agnoster_precmd() {
-  vcs_info
+  setopt LOCAL_OPTIONS
+  unsetopt XTRACE KSH_ARRAYS
+
+  # vcs_info
   PROMPT='%{%f%b%k%}$(prompt_agnoster_main) '
+
+  # Kill the old process of slow commands if it is still running.
+  if (( _prompt_agnoster_precmd_async_pid > 0 )); then
+    kill -KILL "$_prompt_agnoster_precmd_async_pid" &>/dev/null
+  fi
+
+  # Compute slow commands in the background.
+  trap prompt_git_async WINCH
+  prompt_agnoster_precmd_async &!
+  _prompt_agnoster_precmd_async_pid=$!
 }
 
 prompt_agnoster_setup() {
+  setopt LOCAL_OPTIONS
+  unsetopt XTRACE KSH_ARRAYS
+  _prompt_agnoster_precmd_async_pid=0
+  mkdir -p "${TMPPREFIX}"
+  _prompt_agnoster_precmd_async_data="${TMPPREFIX}/$$-prompt_agnoster_data"
+
   autoload -Uz add-zsh-hook
   autoload -Uz vcs_info
 
